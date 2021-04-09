@@ -14,6 +14,16 @@
 
 PHP 5.5 and later
 
+## Last Updates
+
+Added Header Authorization in HTTP Verbs GET, POST, PUT and  DELETE
+
+``` 
+Authorization: Bearer APP_USR-12345678-031820-X-12345678
+```
+
+
+
 ## Installation & Usage
 
 ### Composer
@@ -25,11 +35,11 @@ To install the bindings via [Composer](http://getcomposer.org/), add the followi
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/mercadolibre/php-sdk.git"
+      "url": "https://github.com/ulises-salinas/php-sdk"
     }
   ],
   "require": {
-    "mercadolibre/php-sdk": "*@dev"
+    "ulises-salinas/php-sdk": "dev-master"
   }
 }
 ```
