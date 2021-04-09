@@ -32,8 +32,10 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Query;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
+use GuzzleHttp\Utils;
 use Meli\ApiException;
 use Meli\Configuration;
 use Meli\HeaderSelector;
@@ -70,10 +72,10 @@ class RestClientApi
     protected $hostIndex;
 
     /**
-     * @param ClientInterface $client
-     * @param Configuration   $config
-     * @param HeaderSelector  $selector
-     * @param int             $host_index (Optional) host index to select the list of hosts if defined in the OpenAPI spec
+     * @param ClientInterface|null $client
+     * @param Configuration|null $config
+     * @param HeaderSelector|null $selector
+     * @param int $host_index (Optional) host index to select the list of hosts if defined in the OpenAPI spec
      */
     public function __construct(
         ClientInterface $client = null,
@@ -338,13 +340,13 @@ class RestClientApi
 
 
         // path params
-        if ($resource !== null) {
+        // if ($resource !== null) {
             $resourcePath = str_replace(
                 '{' . 'resource' . '}',
                 ObjectSerializer::toPathValue($resource),
                 $resourcePath
             );
-        }
+        // }
 
         // body params
         $_tempBody = null;
@@ -364,7 +366,7 @@ class RestClientApi
         if (isset($_tempBody)) {
             // $_tempBody is the method argument, if present
             if ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode(ObjectSerializer::sanitizeForSerialization($_tempBody));
+                $httpBody = Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($_tempBody));
             } else {
                 $httpBody = $_tempBody;
             }
@@ -381,11 +383,11 @@ class RestClientApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = Utils::jsonEncode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody =  Query::build($formParams);
             }
         }
 
@@ -394,6 +396,9 @@ class RestClientApi
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
         }
+
+        $defaultHeaders['Authorization'] = 'Bearer ' . $access_token;
+
 
         $headers = array_merge(
             $defaultHeaders,
@@ -411,7 +416,7 @@ class RestClientApi
         $already_querys = ($encode_url != $resourcePath) ? true : false;
         $resourcePath = str_replace('%2F', '/', $resourcePath);
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = Query::build($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($already_querys ? "&{$query}" : "?{$query}"),
@@ -669,7 +674,7 @@ class RestClientApi
         if (isset($_tempBody)) {
             // $_tempBody is the method argument, if present
             if ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode(ObjectSerializer::sanitizeForSerialization($_tempBody));
+                $httpBody = Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($_tempBody));
             } else {
                 $httpBody = $_tempBody;
             }
@@ -686,11 +691,11 @@ class RestClientApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = Utils::jsonEncode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody =  Query::build($formParams);
             }
         }
 
@@ -699,6 +704,8 @@ class RestClientApi
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
         }
+
+        $defaultHeaders['Authorization'] = 'Bearer ' . $access_token;
 
         $headers = array_merge(
             $defaultHeaders,
@@ -716,7 +723,7 @@ class RestClientApi
         $already_querys = ($encode_url != $resourcePath) ? true : false;
         $resourcePath = str_replace('%2F', '/', $resourcePath);
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = Query::build($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($already_querys ? "&{$query}" : "?{$query}"),
@@ -988,7 +995,7 @@ class RestClientApi
         if (isset($_tempBody)) {
             // $_tempBody is the method argument, if present
             if ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode(ObjectSerializer::sanitizeForSerialization($_tempBody));
+                $httpBody = Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($_tempBody));
             } else {
                 $httpBody = $_tempBody;
             }
@@ -1005,11 +1012,11 @@ class RestClientApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = Utils::jsonEncode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody =  Query::build($formParams);
             }
         }
 
@@ -1018,6 +1025,10 @@ class RestClientApi
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
         }
+
+
+        $defaultHeaders['Authorization'] = 'Bearer ' . $access_token;
+
 
         $headers = array_merge(
             $defaultHeaders,
@@ -1035,7 +1046,7 @@ class RestClientApi
         $already_querys = ($encode_url != $resourcePath) ? true : false;
         $resourcePath = str_replace('%2F', '/', $resourcePath);
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = Query::build($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($already_querys ? "&{$query}" : "?{$query}"),
@@ -1265,8 +1276,9 @@ class RestClientApi
         $multipart = false;
 
         // query params
-        if ($access_token !== null) {
-            if('form' === 'form' && is_array($access_token)) {
+        // condition is always true 'cause line 1269 in this file
+        //if ($access_token !== null) {
+            if(  is_array($access_token)) {
                 foreach($access_token as $key => $value) {
                     $queryParams[$key] = $value;
                 }
@@ -1274,17 +1286,17 @@ class RestClientApi
             else {
                 $queryParams['access_token'] = $access_token;
             }
-        }
+        //}
 
 
         // path params
-        if ($resource !== null) {
+        // if ($resource !== null) {
             $resourcePath = str_replace(
                 '{' . 'resource' . '}',
                 ObjectSerializer::toPathValue($resource),
                 $resourcePath
             );
-        }
+        //}
 
         // body params
         $_tempBody = null;
@@ -1307,7 +1319,7 @@ class RestClientApi
         if (isset($_tempBody)) {
             // $_tempBody is the method argument, if present
             if ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode(ObjectSerializer::sanitizeForSerialization($_tempBody));
+                $httpBody = Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($_tempBody));
             } else {
                 $httpBody = $_tempBody;
             }
@@ -1324,11 +1336,11 @@ class RestClientApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = Utils::jsonEncode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody =  Query::build($formParams);
             }
         }
 
@@ -1337,6 +1349,8 @@ class RestClientApi
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
         }
+
+        $defaultHeaders['Authorization'] = 'Bearer ' . $access_token;
 
         $headers = array_merge(
             $defaultHeaders,
@@ -1354,7 +1368,7 @@ class RestClientApi
         $already_querys = ($encode_url != $resourcePath) ? true : false;
         $resourcePath = str_replace('%2F', '/', $resourcePath);
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query =  Query::build($queryParams);
         return new Request(
             'PUT',
             $this->config->getHost() . $resourcePath . ($already_querys ? "&{$query}" : "?{$query}"),
